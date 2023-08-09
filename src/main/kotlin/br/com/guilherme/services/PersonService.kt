@@ -1,6 +1,9 @@
 package br.com.guilherme.services
 
+import br.com.guilherme.exceptions.ResourceNotFoundException
 import br.com.guilherme.model.Person
+import br.com.guilherme.repository.PersonRepository
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.util.concurrent.atomic.AtomicLong
 import java.util.logging.Logger
@@ -8,55 +11,49 @@ import java.util.logging.Logger
 @Service
 class PersonService {
 
-    private val counter = AtomicLong()
+    @Autowired
+    private lateinit var personRepository: PersonRepository
 
     private val logger = Logger.getLogger(PersonService::class.java.name)
 
     fun findById(id: Long): Person {
         logger.info("findById")
 
-        return Person(
-            id = counter.incrementAndGet(),
-            firstName = "Guilherme",
-            lastName = "Santos",
-            address = "Rua do Test",
-            gender = "Male"
-        )
+        return personRepository.findById(id)
+            .orElseThrow { ResourceNotFoundException("Person not found") }
     }
 
     fun findAll(): List<Person> {
         logger.info("findById")
 
-        val persons = mutableListOf<Person>()
-
-        for (i in 0..7) {
-            persons.add(
-                Person(
-                    id = counter.incrementAndGet(),
-                    firstName = "Guilherme",
-                    lastName = "Santos",
-                    address = "Rua do Test",
-                    gender = "Male"
-                )
-            )
-        }
-
-        return persons
+        return personRepository.findAll()
     }
 
-    fun update(person: Person): Person {
+    fun update(id: Long, person: Person): Person {
         logger.info("update")
 
-        return person
+        val entity = personRepository.findById(id)
+            .orElseThrow { ResourceNotFoundException("Person not found") }
+
+        entity.firstName = person.firstName
+        entity.lastName = person.lastName
+        entity.address = person.address
+        entity.gender = person.gender
+
+        return  personRepository.save(entity)
     }
+
 
     fun delete(id: Long) {
         logger.info("delete")
+        val person = personRepository.findById(id)
+            .orElseThrow { ResourceNotFoundException("Person not found") }
+        personRepository.delete(person)
     }
 
     fun create(person: Person): Person {
         logger.info("create")
 
-        return person
+        return personRepository.save(person)
     }
 }

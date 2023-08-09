@@ -3,6 +3,7 @@ package br.com.guilherme.controllers
 import br.com.guilherme.model.Person
 import br.com.guilherme.services.PersonService
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -30,8 +31,11 @@ class PersonController {
     fun create(@RequestBody person: Person) = personService.create(person)
 
     @PutMapping(value = ["/{id}"])
-    fun update(@RequestBody person: Person) = personService.update(person)
+    fun update(@RequestBody person: Person, @PathVariable(value = "id") id: Long) = personService.update(id ,person)
 
     @DeleteMapping(value = ["/{id}"])
-    fun delete(@PathVariable(value = "id") id: Long) = personService.delete(id)
+    fun delete(@PathVariable(value = "id") id: Long): ResponseEntity<*> {
+        personService.delete(id)
+        return ResponseEntity.noContent().build<Any>()
+    }
 }
