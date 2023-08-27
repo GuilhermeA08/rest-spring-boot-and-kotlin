@@ -1,6 +1,7 @@
 package br.com.guilherme.controllers
 
-import br.com.guilherme.model.Person
+import br.com.guilherme.data.vo.v1.PersonVO
+import br.com.guilherme.data.vo.v2.PersonVO as PersonVOV2
 import br.com.guilherme.services.PersonService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
@@ -28,10 +29,13 @@ class PersonController {
     fun findById(@PathVariable(value = "id") id: Long) = personService.findById(id)
 
     @PostMapping
-    fun create(@RequestBody person: Person) = personService.create(person)
+    fun create(@RequestBody person: PersonVO) = personService.create(person)
+
+    @PostMapping("/v2")
+    fun createV2(@RequestBody person: PersonVOV2) = personService.createV2(person)
 
     @PutMapping(value = ["/{id}"])
-    fun update(@RequestBody person: Person, @PathVariable(value = "id") id: Long) = personService.update(id ,person)
+    fun update(@RequestBody person: PersonVO, @PathVariable(value = "id") id: Long) = personService.update(id ,person)
 
     @DeleteMapping(value = ["/{id}"])
     fun delete(@PathVariable(value = "id") id: Long): ResponseEntity<*> {
